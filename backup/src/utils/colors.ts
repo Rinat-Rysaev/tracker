@@ -1,0 +1,6 @@
+export const STREAM_COLORS = [
+  '#6366F1', '#EC4899', '#10B981', '#F59E0B',
+  '#3B82F6', '#EF4444', '#8B5CF6', '#14B8A6',
+  '#F97316', '#84CC16', '#06B6D4', '#A855F7',
+]
+export const DEFAULT_COLOR = STREAM_COLORS[0]
