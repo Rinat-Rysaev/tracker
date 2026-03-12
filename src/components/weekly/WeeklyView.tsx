@@ -95,7 +95,7 @@ function KanbanColumn({ status, label, color, taskIds, taskById, streamColorById
   const { setNodeRef, isOver } = useDroppable({ id: status })
 
   return (
-    <div className="flex flex-col w-72 flex-shrink-0">
+    <div className="flex flex-col w-full sm:w-72 sm:flex-shrink-0">
       {/* Column header */}
       <div className="mb-3 px-1">
         <div className="flex items-center justify-between mb-2">
@@ -108,7 +108,7 @@ function KanbanColumn({ status, label, color, taskIds, taskById, streamColorById
       {/* Cards */}
       <div
         ref={setNodeRef}
-        className={`flex-1 rounded-xl p-2 transition-colors min-h-[120px] ${isOver ? 'bg-indigo-50/70' : 'bg-transparent'}`}
+        className={`flex-1 rounded-xl p-2 transition-colors min-h-[60px] sm:min-h-[120px] ${isOver ? 'bg-indigo-50/70' : 'bg-transparent'}`}
       >
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {taskIds.map(id => {
@@ -270,9 +270,9 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Week header */}
-      <div className="px-6 py-4 bg-white border-b border-gray-100 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div>
+      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
             <p className="text-xs text-gray-400 font-medium tracking-wide">
               {quarter.label} · Week {week}
               {isViewingOtherWeek && week < currentWeek && (
@@ -282,14 +282,15 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
                 <span className="ml-2 text-indigo-400 font-semibold">· future</span>
               )}
             </p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">{dateRange}</p>
+            <p className="text-lg sm:text-xl font-bold text-gray-900 mt-0.5 truncate">{dateRange}</p>
           </div>
           {isViewingOtherWeek && (
             <button
               onClick={onReturnToCurrent}
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors border-0 cursor-pointer flex-shrink-0"
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors border-0 cursor-pointer flex-shrink-0"
             >
-              Current week (W{currentWeek})
+              <span className="hidden sm:inline">Current week (W{currentWeek})</span>
+              <span className="sm:hidden">W{currentWeek} ↩</span>
             </button>
           )}
         </div>
@@ -319,7 +320,7 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
         onDragCancel={onDragCancel}
       >
         <div className="flex-1 overflow-auto flex">
-          <div className="flex gap-5 px-6 py-5 mx-auto">
+          <div className="flex gap-4 sm:gap-5 px-4 sm:px-6 py-4 sm:py-5 mx-auto">
             {COLUMNS.map(col => (
               <KanbanColumn
                 key={col.id}
@@ -342,7 +343,7 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
 
         <DragOverlay dropAnimation={{ duration: 150, easing: 'ease' }}>
           {activeTask && (
-            <div className="w-72 shadow-2xl rotate-1 opacity-95">
+            <div className="w-[80vw] sm:w-72 shadow-2xl rotate-1 opacity-95">
               <div className="flex overflow-hidden bg-white rounded-xl border border-indigo-200 shadow-lg">
                 <CardContent
                   task={activeTask}

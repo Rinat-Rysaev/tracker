@@ -1,14 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useStreams } from '../../hooks/useConvexStreams'
 import { useUIStore } from '../../store/uiStore'
 import { useCurrentWeek } from '../../hooks/useCurrentWeek'
 import { useQuarters } from '../../hooks/useConvexQuarters'
+import { useIsMobile } from '../../hooks/useIsMobile'
 import { getWeekDateRange, getQuarterMonthGroups } from '../../utils/date'
 import { RoadmapCell } from './RoadmapCell'
 import type { QuarterId } from '../../types'
 
 const ALL_WEEKS = Array.from({ length: 13 }, (_, i) => i + 1)
-const LABEL_W = 140
 
 interface Props {
   quarterId: QuarterId
@@ -20,6 +20,15 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
   const openStream = useUIStore(s => s.openStream)
   const currentWeek = useCurrentWeek()
   const { activeQuarter: quarter } = useQuarters()
+  const isMobile = useIsMobile()
+  const [windowWidth, setWindowWidth] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth : 375
+  )
+  useEffect(() => {
+    const handler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener('resize', handler, { passive: true })
+    return () => window.removeEventListener('resize', handler)
+  }, [])
 
   const [view, setView] = useState<'quarter' | 0 | 1 | 2>('quarter')
 
@@ -32,12 +41,16 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
     ? ALL_WEEKS
     : (monthGroups[view as number]?.weeks ?? ALL_WEEKS)
 
-  const colWidth = view === 'quarter' ? 110 : 160
+  // Mobile: dynamically fit exactly 5 columns in visible width
+  const LABEL_W = isMobile ? 88 : 140
+  const colWidth = isMobile
+    ? Math.max(48, Math.floor((windowWidth - LABEL_W) / 5))
+    : (view === 'quarter' ? 110 : 160)
 
   return (
     <div className="flex-1 overflow-auto flex flex-col">
       {/* Sub-nav: Quarter | Month1 | Month2 | Month3 */}
-      <div className="flex-shrink-0 px-4 pt-3 pb-2 bg-gray-50 border-b border-gray-100 flex items-center gap-1">
+      <div className="flex-shrink-0 px-3 sm:px-4 pt-2.5 sm:pt-3 pb-2 bg-gray-50 border-b border-gray-100 flex items-center gap-1">
         <nav className="flex items-center gap-0.5 bg-gray-100 p-1 rounded-xl">
           {(['quarter', 0, 1, 2] as const).map(v => {
             const label = v === 'quarter' ? 'Quarter' : monthGroups[v]?.label ?? ''
@@ -46,7 +59,7 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
               <button
                 key={String(v)}
                 onClick={() => setView(v)}
-                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer border-0
+                className={`px-2 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer border-0
                   ${active
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-500 hover:text-gray-700 bg-transparent'}`}
