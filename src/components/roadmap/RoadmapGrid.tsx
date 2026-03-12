@@ -42,10 +42,10 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
     ? ALL_WEEKS
     : (monthGroups[view as number]?.weeks ?? ALL_WEEKS)
 
-  // Mobile: dynamically fit exactly 5 columns in visible width
+  // Mobile: show 3 wide columns at a time (rest reachable via horizontal scroll)
   const LABEL_W = isMobile ? 88 : 140
   const colWidth = isMobile
-    ? Math.max(48, Math.floor((windowWidth - LABEL_W) / 5))
+    ? Math.max(64, Math.floor((windowWidth - LABEL_W) / 3))
     : (view === 'quarter' ? 110 : 160)
 
   // Mobile: auto-scroll to current week on quarter view

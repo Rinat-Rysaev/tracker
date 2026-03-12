@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   DndContext, DragOverlay, closestCorners,
-  PointerSensor, KeyboardSensor,
+  PointerSensor, TouchSensor, KeyboardSensor,
   useSensor, useSensors, useDroppable,
 } from '@dnd-kit/core'
 import type { DragStartEvent, DragEndEvent, DragOverEvent } from '@dnd-kit/core'
@@ -71,8 +71,9 @@ function KanbanCard({ task, streamColor, streamName, onOpen }: {
         {...attributes}
         {...listeners}
         onClick={onOpen}
+        style={{ touchAction: 'none' }}
         className="flex overflow-hidden bg-white rounded-xl border border-gray-100 shadow-sm
-                   hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer select-none touch-manipulation"
+                   hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer select-none"
       >
         <CardContent task={task} streamColor={streamColor} streamName={streamName} />
       </div>
@@ -191,7 +192,13 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
   }, [allTasks, activeId])
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,   // hold 200ms before drag starts
+        tolerance: 6, // allow 6px movement during delay
+      },
+    }),
     useSensor(KeyboardSensor)
   )
 
