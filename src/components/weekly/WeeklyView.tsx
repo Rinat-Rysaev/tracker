@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
-  DndContext, DragOverlay, closestCorners,
+  DndContext, DragOverlay, rectIntersection,
   PointerSensor, TouchSensor, KeyboardSensor,
   useSensor, useSensors, useDroppable,
 } from '@dnd-kit/core'
@@ -39,7 +39,7 @@ function CardContent({ task, streamColor, streamName }: { task: Task; streamColo
     <>
       <div className="w-[3px] self-stretch flex-shrink-0 rounded-l-xl" style={{ background: streamColor }} />
       <div className="flex-1 p-2 sm:p-3 min-w-0">
-        <p className={`text-xs sm:text-sm font-medium leading-snug truncate ${task.status === 'done' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+        <p className={`text-xs sm:text-sm font-medium leading-snug line-clamp-2 ${task.status === 'done' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
           {task.title}
         </p>
         {task.description && (
@@ -96,7 +96,7 @@ function KanbanColumn({ status, label, color, taskIds, taskById, streamColorById
   const { setNodeRef, isOver } = useDroppable({ id: status })
 
   return (
-    <div className="flex flex-col flex-1 min-w-0 sm:flex-none sm:w-72">
+    <div ref={setNodeRef} className="flex flex-col flex-1 min-w-0 sm:flex-none sm:w-72">
       {/* Column header */}
       <div className="mb-2 sm:mb-3 px-0.5 sm:px-1">
         <div className="flex items-center justify-between mb-1.5 sm:mb-2">
@@ -108,7 +108,6 @@ function KanbanColumn({ status, label, color, taskIds, taskById, streamColorById
 
       {/* Cards */}
       <div
-        ref={setNodeRef}
         className={`flex-1 rounded-xl p-1 sm:p-2 transition-colors min-h-[60px] sm:min-h-[120px] ${isOver ? 'bg-indigo-50/70' : 'bg-transparent'}`}
       >
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
@@ -186,10 +185,12 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [columns, setColumns] = useState<Record<TaskStatus, string[]>>(() => initColumns(allTasks))
 
-  // Sync columns from store when not dragging
+  // Sync columns from server — only when allTasks changes, not on drag-end
+  // (removing activeId from deps prevents the snap-back race where local state
+  //  resets before the server confirms the new position)
   useEffect(() => {
     if (activeId === null) setColumns(initColumns(allTasks))
-  }, [allTasks, activeId])
+  }, [allTasks])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -328,7 +329,7 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
       {/* Board — always rendered */}
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={rectIntersection}
         onDragStart={onDragStart}
         onDragOver={onDragOver}
         onDragEnd={onDragEnd}
