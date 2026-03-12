@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useStreams } from '../../hooks/useConvexStreams'
 import { useUIStore } from '../../store/uiStore'
 import { useCurrentWeek } from '../../hooks/useCurrentWeek'
@@ -21,6 +21,7 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
   const currentWeek = useCurrentWeek()
   const { activeQuarter: quarter } = useQuarters()
   const isMobile = useIsMobile()
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [windowWidth, setWindowWidth] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth : 375
   )
@@ -47,6 +48,14 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
     ? Math.max(48, Math.floor((windowWidth - LABEL_W) / 5))
     : (view === 'quarter' ? 110 : 160)
 
+  // Mobile: auto-scroll to current week on quarter view
+  useEffect(() => {
+    if (!isMobile || view !== 'quarter' || !scrollContainerRef.current) return
+    // Show one week before current for context
+    const scrollTo = Math.max(0, (currentWeek - 2) * colWidth)
+    scrollContainerRef.current.scrollLeft = scrollTo
+  }, [isMobile, currentWeek, colWidth, view])
+
   return (
     <div className="flex-1 overflow-auto flex flex-col">
       {/* Sub-nav: Quarter | Month1 | Month2 | Month3 */}
@@ -71,7 +80,8 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
         </nav>
       </div>
 
-      <div className="flex-1 overflow-auto">
+      {/* Scroll wrapper — only the table scrolls horizontally */}
+      <div ref={scrollContainerRef} className="flex-1 overflow-auto">
         <table className="border-collapse" style={{ tableLayout: 'fixed' }}>
           <colgroup>
             <col style={{ width: LABEL_W, minWidth: LABEL_W }} />
@@ -96,10 +106,10 @@ export function RoadmapGrid({ quarterId, onWeekClick }: Props) {
                     className={`border-b-2 border-r border-gray-200 py-2 text-center cursor-pointer transition-colors
                       ${isCurrent ? 'bg-indigo-50 border-t-2 border-t-indigo-400' : isPast ? 'bg-gray-50/50 hover:bg-indigo-50' : 'bg-gray-50 hover:bg-indigo-50'}`}
                   >
-                    <span className={`text-xs font-semibold ${isCurrent ? 'text-indigo-600' : isPast ? 'text-gray-300' : 'text-gray-400'}`}>
+                    <span className={`text-xs font-bold ${isCurrent ? 'text-indigo-600' : isPast ? 'text-gray-300' : 'text-gray-400'}`}>
                       W{w}
                     </span>
-                    {isCurrent && <div className="mx-auto mt-0.5 w-1 h-1 rounded-full bg-indigo-500" />}
+                    {isCurrent && <div className="mx-auto mt-0.5 w-1.5 h-1.5 rounded-full bg-indigo-500" />}
                   </th>
                 )
               })}

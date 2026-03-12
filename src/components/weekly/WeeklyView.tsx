@@ -38,15 +38,15 @@ function CardContent({ task, streamColor, streamName }: { task: Task; streamColo
   return (
     <>
       <div className="w-[3px] self-stretch flex-shrink-0 rounded-l-xl" style={{ background: streamColor }} />
-      <div className="flex-1 p-3 min-w-0">
-        <p className={`text-sm font-medium leading-snug ${task.status === 'done' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+      <div className="flex-1 p-2 sm:p-3 min-w-0">
+        <p className={`text-xs sm:text-sm font-medium leading-snug truncate ${task.status === 'done' ? 'line-through text-gray-400' : 'text-gray-900'}`}>
           {task.title}
         </p>
         {task.description && (
-          <p className="text-xs text-gray-400 truncate mt-1">{task.description}</p>
+          <p className="hidden sm:block text-xs text-gray-400 truncate mt-1">{task.description}</p>
         )}
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
-          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: streamColor }}>
+        <div className="flex items-center gap-1.5 mt-1.5 sm:mt-2 flex-wrap">
+          <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider truncate max-w-[60px] sm:max-w-none" style={{ color: streamColor }}>
             {streamName}
           </span>
           <PriorityBadge priority={task.priority} />
@@ -65,14 +65,14 @@ function KanbanCard({ task, streamColor, streamName, onOpen }: {
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.25 : 1 }}
-      className="mb-2"
+      className="mb-1.5 sm:mb-2"
     >
       <div
         {...attributes}
         {...listeners}
         onClick={onOpen}
         className="flex overflow-hidden bg-white rounded-xl border border-gray-100 shadow-sm
-                   hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer select-none"
+                   hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer select-none touch-manipulation"
       >
         <CardContent task={task} streamColor={streamColor} streamName={streamName} />
       </div>
@@ -95,12 +95,12 @@ function KanbanColumn({ status, label, color, taskIds, taskById, streamColorById
   const { setNodeRef, isOver } = useDroppable({ id: status })
 
   return (
-    <div className="flex flex-col w-full sm:w-72 sm:flex-shrink-0">
+    <div className="flex flex-col flex-1 min-w-0 sm:flex-none sm:w-72">
       {/* Column header */}
-      <div className="mb-3 px-1">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{label}</span>
-          <span className="text-xs font-semibold text-gray-400 tabular-nums">{taskIds.length}</span>
+      <div className="mb-2 sm:mb-3 px-0.5 sm:px-1">
+        <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+          <span className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider sm:tracking-widest truncate">{label}</span>
+          <span className="text-[10px] sm:text-xs font-semibold text-gray-400 tabular-nums ml-1 flex-shrink-0">{taskIds.length}</span>
         </div>
         <div className="h-0.5 rounded-full" style={{ background: color }} />
       </div>
@@ -108,7 +108,7 @@ function KanbanColumn({ status, label, color, taskIds, taskById, streamColorById
       {/* Cards */}
       <div
         ref={setNodeRef}
-        className={`flex-1 rounded-xl p-2 transition-colors min-h-[60px] sm:min-h-[120px] ${isOver ? 'bg-indigo-50/70' : 'bg-transparent'}`}
+        className={`flex-1 rounded-xl p-1 sm:p-2 transition-colors min-h-[60px] sm:min-h-[120px] ${isOver ? 'bg-indigo-50/70' : 'bg-transparent'}`}
       >
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {taskIds.map(id => {
@@ -125,21 +125,29 @@ function KanbanColumn({ status, label, color, taskIds, taskById, streamColorById
             )
           })}
         </SortableContext>
+
+        {/* Empty state — clickable to add task */}
         {taskIds.length === 0 && (
-          <div className="flex items-center justify-center h-16 rounded-lg border-2 border-dashed border-gray-200">
-            <span className="text-xs text-gray-300 font-medium">No tasks · click + to add</span>
-          </div>
+          <button
+            onClick={onAddTask}
+            className="flex items-center justify-center w-full h-16 rounded-lg border-2 border-dashed border-gray-200
+                       hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors cursor-pointer bg-transparent touch-manipulation"
+          >
+            <span className="text-xs text-gray-300 hover:text-indigo-400 font-medium select-none">+ Add task</span>
+          </button>
         )}
       </div>
 
-      {/* Add task button */}
-      <button
-        onClick={onAddTask}
-        className="mt-2 w-full py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-indigo-600
-                   hover:bg-indigo-50 transition-colors cursor-pointer border-0 bg-transparent"
-      >
-        + Add task
-      </button>
+      {/* Add task button — only shown when column has tasks */}
+      {taskIds.length > 0 && (
+        <button
+          onClick={onAddTask}
+          className="mt-1.5 sm:mt-2 w-full py-1.5 rounded-lg text-xs font-semibold text-gray-400 hover:text-indigo-600
+                     hover:bg-indigo-50 transition-colors cursor-pointer border-0 bg-transparent touch-manipulation"
+        >
+          + Add task
+        </button>
+      )}
     </div>
   )
 }
@@ -287,7 +295,7 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
           {isViewingOtherWeek && (
             <button
               onClick={onReturnToCurrent}
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors border-0 cursor-pointer flex-shrink-0"
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 sm:px-3 py-1.5 rounded-lg transition-colors border-0 cursor-pointer flex-shrink-0 touch-manipulation"
             >
               <span className="hidden sm:inline">Current week (W{currentWeek})</span>
               <span className="sm:hidden">W{currentWeek} ↩</span>
@@ -295,7 +303,7 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
           )}
         </div>
         {total > 0 && (
-          <div className="mt-3">
+          <div className="mt-2 sm:mt-3">
             <div className="flex justify-between text-xs text-gray-400 mb-1.5">
               <span>{doneCount} of {total} done</span>
               <span className="font-semibold text-indigo-500">{Math.round(doneCount / total * 100)}%</span>
@@ -320,7 +328,7 @@ export function WeeklyView({ week, onReturnToCurrent }: Props) {
         onDragCancel={onDragCancel}
       >
         <div className="flex-1 overflow-auto flex">
-          <div className="flex gap-4 sm:gap-5 px-4 sm:px-6 py-4 sm:py-5 mx-auto">
+          <div className="flex gap-1.5 sm:gap-5 px-2 sm:px-6 py-3 sm:py-5 w-full sm:w-auto sm:mx-auto">
             {COLUMNS.map(col => (
               <KanbanColumn
                 key={col.id}

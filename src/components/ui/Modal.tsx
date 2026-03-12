@@ -32,9 +32,13 @@ export function Modal({ open, onClose, children, wide }: Props) {
       style={{ background: 'rgba(0,0,0,0.45)' }}
     >
       <div
-        className={`bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full flex flex-col ${wide ? 'sm:max-w-xl' : 'sm:max-w-md'} max-h-[90vh] overflow-y-auto`}
-        style={{ animation: 'slideUp 0.2s ease' }}
+        className={`bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full flex flex-col ${wide ? 'sm:max-w-xl' : 'sm:max-w-md'} max-h-[85dvh] sm:max-h-[90vh] overflow-y-auto`}
+        style={{ animation: 'slideUp 0.2s ease', paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
+        {/* Drag handle — mobile only */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden flex-shrink-0">
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
+        </div>
         {children}
       </div>
       <style>{`@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }`}</style>

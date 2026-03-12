@@ -96,45 +96,45 @@ export function TaskModal() {
 
   return (
     <Modal open={open} onClose={close} wide>
-      <div className="p-6 flex flex-col gap-5">
-        <h2 className="text-lg font-bold text-gray-900">{editing ? 'Edit task' : 'New task'}</h2>
+      <div className="p-4 sm:p-6 flex flex-col gap-3 sm:gap-5">
+        <h2 className="text-base sm:text-lg font-bold text-gray-900">{editing ? 'Edit task' : 'New task'}</h2>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-gray-700">Title *</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs sm:text-sm font-semibold text-gray-700">Title *</label>
           <input
             autoFocus
             value={title}
             onChange={e => setTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && save()}
             placeholder="What needs to be done?"
-            className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+            className="border border-gray-200 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-gray-700">Description</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs sm:text-sm font-semibold text-gray-700">Description</label>
           <textarea
             value={desc}
             onChange={e => setDesc(e.target.value)}
             placeholder="Details (optional)"
-            rows={3}
-            className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 resize-none"
+            rows={2}
+            className="border border-gray-200 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 resize-none"
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-gray-700">Priority</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs sm:text-sm font-semibold text-gray-700">Priority</label>
           <PrioritySelector value={priority} onChange={setPriority} />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-gray-700">Week</label>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs sm:text-sm font-semibold text-gray-700">Week</label>
+          <div className="flex flex-wrap gap-1 sm:gap-1.5">
             {WEEKS.map(w => (
               <button
                 key={w}
                 onClick={() => setWeek(w)}
-                className={`w-9 h-9 rounded-lg text-sm font-semibold border-0 cursor-pointer transition-colors
+                className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg text-xs sm:text-sm font-semibold border-0 cursor-pointer transition-colors touch-manipulation
                   ${week === w ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
               >
                 {w}
@@ -143,12 +143,12 @@ export function TaskModal() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-gray-700">Stream</label>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs sm:text-sm font-semibold text-gray-700">Stream</label>
           <select
             value={streamId}
             onChange={e => setStreamId(e.target.value)}
-            className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 bg-white cursor-pointer"
+            className="border border-gray-200 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 bg-white cursor-pointer"
           >
             {streams.map(s => (
               <option key={s._id} value={s._id}>{s.name}</option>
@@ -157,7 +157,7 @@ export function TaskModal() {
           </select>
 
           {isCreatingStream && (
-            <div className="mt-2 p-4 bg-gray-50 rounded-xl border border-gray-200 flex flex-col gap-3">
+            <div className="mt-2 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-200 flex flex-col gap-2 sm:gap-3">
               <input
                 autoFocus
                 value={newStreamName}
@@ -170,7 +170,7 @@ export function TaskModal() {
               <button
                 onClick={handleCreateStream}
                 disabled={!newStreamName.trim()}
-                className="bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white font-semibold py-2 rounded-lg transition-colors cursor-pointer border-0 text-sm"
+                className="bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white font-semibold py-2 rounded-lg transition-colors cursor-pointer border-0 text-sm touch-manipulation"
               >
                 Create stream
               </button>
@@ -181,7 +181,7 @@ export function TaskModal() {
         <button
           onClick={save}
           disabled={!title.trim() || isCreatingStream}
-          className="bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white font-bold py-3 rounded-xl transition-colors cursor-pointer border-0"
+          className="bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-200 text-white font-bold py-2.5 sm:py-3 rounded-xl transition-colors cursor-pointer border-0 touch-manipulation"
         >
           {editing ? 'Save' : 'Create'}
         </button>
@@ -189,7 +189,7 @@ export function TaskModal() {
         {editing && (
           <button
             onClick={remove}
-            className="border border-red-200 text-red-600 hover:bg-red-50 font-semibold py-2.5 rounded-xl transition-colors cursor-pointer bg-transparent"
+            className="border border-red-200 text-red-600 hover:bg-red-50 font-semibold py-2 sm:py-2.5 rounded-xl transition-colors cursor-pointer bg-transparent touch-manipulation"
           >
             Delete task
           </button>
