@@ -33,10 +33,12 @@ export const add = mutation({
     year: v.number(),
     quarter: v.number(),
     startDate: v.string(),
+    copyFromQuarterId: v.optional(v.id("quarters")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    const quarterId = await ctx.db.insert("quarters", { userId, ...args });
+    const { copyFromQuarterId, ...quarterFields } = args;
+    const quarterId = await ctx.db.insert("quarters", { userId, ...quarterFields });
 
     // Set as active
     const settings = await ctx.db
@@ -49,20 +51,36 @@ export const add = mutation({
       await ctx.db.insert("userSettings", { userId, activeQuarterId: quarterId });
     }
 
-    // Seed default streams
-    const DEFAULT_STREAMS = [
-      { name: "Backend", color: "#6366F1" },
-      { name: "Frontend", color: "#EC4899" },
-      { name: "Design", color: "#10B981" },
-    ];
-    for (let i = 0; i < DEFAULT_STREAMS.length; i++) {
-      await ctx.db.insert("streams", {
-        userId,
-        name: DEFAULT_STREAMS[i].name,
-        color: DEFAULT_STREAMS[i].color,
-        order: i,
-        quarterId,
-      });
+    // Seed streams: copy from existing quarter or use defaults
+    if (copyFromQuarterId) {
+      const sourceStreams = await ctx.db
+        .query("streams")
+        .withIndex("by_quarter", (q) => q.eq("quarterId", copyFromQuarterId))
+        .collect();
+      for (const s of sourceStreams) {
+        await ctx.db.insert("streams", {
+          userId,
+          name: s.name,
+          color: s.color,
+          order: s.order,
+          quarterId,
+        });
+      }
+    } else {
+      const DEFAULT_STREAMS = [
+        { name: "Backend", color: "#6366F1" },
+        { name: "Frontend", color: "#EC4899" },
+        { name: "Design", color: "#10B981" },
+      ];
+      for (let i = 0; i < DEFAULT_STREAMS.length; i++) {
+        await ctx.db.insert("streams", {
+          userId,
+          name: DEFAULT_STREAMS[i].name,
+          color: DEFAULT_STREAMS[i].color,
+          order: i,
+          quarterId,
+        });
+      }
     }
 
     return quarterId;
