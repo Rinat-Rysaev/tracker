@@ -32,6 +32,7 @@ export function TaskModal() {
 
   useEffect(() => {
     if (!open) return
+    if (editingTaskId && !editing) return // still loading
     if (editing) {
       setTitle(editing.title)
       setDesc(editing.description ?? '')
@@ -49,7 +50,7 @@ export function TaskModal() {
     }
     setNewStreamName('')
     setNewStreamColor(STREAM_COLORS[0])
-  }, [open, editingTaskId])
+  }, [open, editingTaskId, editing])
 
   const isCreatingStream = streamId === '__new__'
 
